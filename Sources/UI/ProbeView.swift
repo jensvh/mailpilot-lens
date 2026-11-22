@@ -7,6 +7,7 @@ import SwiftUI
 struct ProbeView: View {
     @EnvironmentObject private var walk: Walk
     @EnvironmentObject private var glasses: Glasses
+    @EnvironmentObject private var band: NeuralBand
 
     @State private var headings = 1
     @State private var bodies = 3
@@ -43,6 +44,19 @@ struct ProbeView: View {
                     .foregroundStyle(.secondary)
             } header: {
                 Text("Does a card survive")
+            }
+
+            Section {
+                Button("Look for the Neural Band") { band.lookNow() }
+                if !band.note.isEmpty { Text(band.note).font(.footnote) }
+                if let name = band.name { LabeledContent("Band", value: name + (band.battery.map { " · \($0)%" } ?? "")) }
+                ForEach(band.devices, id: \.self) { device in
+                    Text(device).font(.footnote).foregroundStyle(.secondary)
+                }
+            } header: {
+                Text("Neural Band")
+            } footer: {
+                Text("Meta's toolkit doesn't report the band. This lists the Bluetooth devices connected to the phone and reads the band's battery if it shares it. Write down what it lists: the band may talk to the glasses only.")
             }
 
             Section {

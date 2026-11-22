@@ -22,6 +22,7 @@ struct LensApp: App {
                 .environmentObject(walk.voice)
                 .environmentObject(walk.glasses)
                 .environmentObject(walk.glasses.display)
+                .environmentObject(walk.band)
                 .onOpenURL { url in walk.open(url) }
                 .preferredColorScheme(.dark)
         }

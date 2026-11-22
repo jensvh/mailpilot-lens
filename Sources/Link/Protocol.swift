@@ -183,7 +183,8 @@ enum LensUp {
     case act(cardId: String, action: String, rev: Int)
     /// A speech message was said to the end (`done`), or cut off.
     case spoke(id: String, done: Bool)
-    case status(glasses: Bool, worn: Bool, battery: Int?, mic: String?, display: Bool)
+    /// `band`: the Neural Band is connected to the phone; nil when the phone can't tell.
+    case status(glasses: Bool, worn: Bool, battery: Int?, mic: String?, display: Bool, band: Bool?, bandBattery: Int?)
     case ping(Int)
     /// Asks to be paired; sealed with the pairing code's secret.
     case pair(name: String, app: String?)
@@ -221,12 +222,14 @@ enum LensUp {
         case .spoke(let id, let done):
             out["id"] = id
             out["done"] = done
-        case .status(let glasses, let worn, let battery, let mic, let display):
+        case .status(let glasses, let worn, let battery, let mic, let display, let band, let bandBattery):
             out["glasses"] = glasses
             out["worn"] = worn
             if let battery { out["battery"] = battery }
             if let mic { out["mic"] = mic }
             out["display"] = display
+            if let band { out["band"] = band }
+            if let bandBattery { out["bandBattery"] = bandBattery }
         case .ping(let n):
             out["n"] = n
         case .pair(let name, let app):

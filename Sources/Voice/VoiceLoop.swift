@@ -59,6 +59,7 @@ final class VoiceLoop: ObservableObject {
     private let gate = PcmGate()
     private var quietTimer: Task<Void, Never>?
     private var tail: Task<Void, Never>?
+    private var watchdog: Task<Void, Never>?
     private var retry: Task<Void, Never>?
     private var retries = 0
     private var serverWantsWords = false
@@ -108,6 +109,7 @@ final class VoiceLoop: ObservableObject {
     func end() {
         quietTimer?.cancel()
         tail?.cancel()
+        watchdog?.cancel()
         retry?.cancel()
         gate.mode = .closed
         audio.onPCM = nil
@@ -120,10 +122,22 @@ final class VoiceLoop: ObservableObject {
 
     // MARK: Waking and sleeping
 
-    /// Opens the microphone (a pinch, the Talk button, a card that expects words).
-    func wake(_ why: String, chime: Bool = true) {
+    /// Opens the microphone (a pinch, the Talk button, a card that expects words). `interrupt`: you asked to
+    /// talk, so what is being said stops and it listens at once.
+    func wake(_ why: String, chime: Bool = true, interrupt: Bool = false) {
         guard mode != .off else { return }
         serverAsleep = false
+        if interrupt, mode == .speaking {
+            Log.say("voice: listening (\(why), it stopped talking)")
+            tail?.cancel()
+            watchdog?.cancel()
+            wasAsleepBeforeSpeech = false
+            setMode(.listening)
+            speaker.stop()
+            gate.mode = .open
+            restartQuietTimer()
+            return
+        }
         if mode == .asleep {
             Log.say("voice: awake (\(why))")
             if chime { audio.earcon("wake") }
@@ -189,7 +203,7 @@ final class VoiceLoop: ObservableObject {
     /// Something MailPilot wants heard: a sound, words, or just "stop talking".
     func say(_ message: LensSpeak) {
         guard mode != .off else { return }
-        let parts = message.parts ?? []
+        let parts = (message.parts ?? []).filter { !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
         if message.interrupt ?? true { speaker.stop() }
         if let earcon = message.earcon { audio.earcon(earcon) }
         guard !parts.isEmpty else { return }
@@ -218,6 +232,30 @@ final class VoiceLoop: ObservableObject {
             gate.mode = settings.bargeIn ? .open : .silence
         }
         setMode(.speaking)
+        watchSpeech()
+    }
+
+    /// While it speaks, the microphone hears silence. So "speaking" must end when the voice does, even if the
+    /// voice never says it finished: every half second it checks, and after a second and a half of a quiet voice
+    /// it goes on as if the speech ended.
+    private func watchSpeech() {
+        watchdog?.cancel()
+        watchdog = Task { [weak self] in
+            var quiet = 0
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 500_000_000)
+                guard let self, !Task.isCancelled, self.mode == .speaking else { return }
+                quiet = self.speaker.busy ? 0 : quiet + 1
+                guard quiet >= 3 else { continue }
+                self.speaker.settle()
+                if self.mode == .speaking, !self.speaker.speaking {
+                    Log.say("voice: the speech ended without a word from the voice; listening again")
+                    self.tail?.cancel()
+                    self.afterSpeech()
+                }
+                return
+            }
+        }
     }
 
     private func spoke(_ id: String, _ done: Bool) {
@@ -234,6 +272,8 @@ final class VoiceLoop: ObservableObject {
 
     /// It has spoken: the microphone opens by itself, unless you said "sleep".
     private func afterSpeech() {
+        watchdog?.cancel()
+        guard mode == .speaking else { return }
         if serverAsleep {
             setMode(.listening)
             sleep("you said sleep")

@@ -39,8 +39,8 @@ let mine: [String: [LensUp]] = [
     "hello": [.hello(device: "abc123", app: "0.1.0 (1)", language: "nl", fresh: true), .hello(device: "abc123", app: nil, language: nil, fresh: false)],
     "speaking": [.speaking],
     "spoke": [.spoke(id: "s1-s3", done: false)],
-    "status": [.status(glasses: true, worn: true, battery: 62, mic: "Ray-Ban Display (Bluetooth headset)", display: true),
-               .status(glasses: false, worn: false, battery: nil, mic: nil, display: false)],
+    "status": [.status(glasses: true, worn: true, battery: 62, mic: "Ray-Ban Display (Bluetooth headset)", display: true, band: true, bandBattery: 71),
+               .status(glasses: false, worn: false, battery: nil, mic: nil, display: false, band: nil, bandBattery: nil)],
     "ping": [.ping(7)],
     "pair": [.pair(name: "iPhone", app: "0.1.0 (1)")],
 ]

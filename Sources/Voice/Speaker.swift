@@ -19,9 +19,8 @@ final class Speaker: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
     var language = "en"
 
     private let synth = AVSpeechSynthesizer()
-    /// The utterances still to be said, and the message each belongs to.
-    private var jobs: [ObjectIdentifier: (utterance: AVSpeechUtterance, id: String)] = [:]
-    private var left: [String: Int] = [:]
+    /// The utterances still to be said, in order, and the message each belongs to.
+    private var jobs: [(utterance: AVSpeechUtterance, id: String)] = []
     private var voices: [String: AVSpeechSynthesisVoice] = [:]
 
     override init() {
@@ -33,7 +32,8 @@ final class Speaker: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
     func speak(id: String, parts: [LensSay], lead: Double = 0) {
         let wanted = parts.filter { !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
         guard !wanted.isEmpty else { return }
-        left[id] = wanted.count
+        // It counts as speaking from now on, before the first callback: whoever asks gets the truth.
+        speaking = true
         for (index, part) in wanted.enumerated() {
             let utterance = AVSpeechUtterance(string: part.text)
             utterance.voice = voice(part.lang ?? guess(part.text))
@@ -41,18 +41,20 @@ final class Speaker: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
             utterance.rate = min(AVSpeechUtteranceMaximumSpeechRate,
                                  max(AVSpeechUtteranceMinimumSpeechRate, AVSpeechUtteranceDefaultSpeechRate + Float(rate - 1) * span * 0.5))
             if index == 0, lead > 0 { utterance.preUtteranceDelay = lead }
-            jobs[ObjectIdentifier(utterance)] = (utterance, id)
+            jobs.append((utterance, id))
             synth.speak(utterance)
         }
-        speaking = true
     }
+
+    /// Something is still being said, or waits to be: by its own count, or by the synthesizer's.
+    var busy: Bool { !jobs.isEmpty || synth.isSpeaking }
 
     /// Stops at once. What was being said, and what waited, counts as cut off.
     func stop() {
-        guard !left.isEmpty || synth.isSpeaking else { return }
-        let cut = Array(left.keys)
-        left = [:]
-        jobs = [:]
+        guard busy || speaking else { return }
+        var cut: [String] = []
+        for job in jobs where !cut.contains(job.id) { cut.append(job.id) }
+        jobs = []
         synth.stopSpeaking(at: .immediate)
         speaking = false
         for id in cut { onFinished?(id, false) }
@@ -101,25 +103,33 @@ final class Speaker: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
     // MARK: AVSpeechSynthesizerDelegate
 
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        let key = ObjectIdentifier(utterance)
-        DispatchQueue.main.async { self.ended(key, done: true) }
+        DispatchQueue.main.async { self.ended(utterance, done: true) }
     }
 
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
-        let key = ObjectIdentifier(utterance)
-        DispatchQueue.main.async { self.ended(key, done: false) }
+        DispatchQueue.main.async { self.ended(utterance, done: false) }
     }
 
-    private func ended(_ key: ObjectIdentifier, done: Bool) {
-        // One that `stop()` already counted as cut off is no longer listed.
-        guard let job = jobs.removeValue(forKey: key) else { return }
-        let remaining = (left[job.id] ?? 1) - 1
-        if remaining > 0 {
-            left[job.id] = remaining
-        } else {
-            left[job.id] = nil
-            onFinished?(job.id, done)
-        }
-        if left.isEmpty { speaking = false }
+    /// One utterance is over. The synthesizer says them in order, so when it hands back an utterance this list
+    /// doesn't know by identity, it is the first one waiting.
+    private func ended(_ utterance: AVSpeechUtterance, done: Bool) {
+        guard !jobs.isEmpty else { return }  // stop() counted them already
+        let index = jobs.firstIndex { $0.utterance === utterance } ?? 0
+        let job = jobs.remove(at: index)
+        let more = jobs.contains { $0.id == job.id }
+        // Not speaking any more is true before anyone is told it finished.
+        if jobs.isEmpty { speaking = false }
+        if !more { onFinished?(job.id, done) }
+    }
+
+    /// The synthesizer went quiet without a word about the rest (it happens): what waited counts as said.
+    func settle() {
+        guard !synth.isSpeaking, !jobs.isEmpty || speaking else { return }
+        var said: [String] = []
+        for job in jobs where !said.contains(job.id) { said.append(job.id) }
+        jobs = []
+        speaking = false
+        Log.say("speech: the voice went quiet without saying so; carrying on")
+        for id in said { onFinished?(id, true) }
     }
 }

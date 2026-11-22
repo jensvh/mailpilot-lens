@@ -9,6 +9,7 @@ struct HomeView: View {
     @EnvironmentObject private var voice: VoiceLoop
     @EnvironmentObject private var audio: Audio
     @EnvironmentObject private var stt: SttClient
+    @EnvironmentObject private var band: NeuralBand
 
     @State private var typed = ""
     @State private var showSettings = false
@@ -135,6 +136,7 @@ struct HomeView: View {
         VStack(spacing: 0) {
             statusRow("desktopcomputer", "MailPilot", linkText, linkColour)
             statusRow("eyeglasses", "Glasses", glassesText, glasses.connected ? .green : .gray)
+            statusRow("hand.pinch", "Neural Band", bandText, band.seen == .connected ? ((band.battery ?? 100) <= 20 ? .orange : .green) : .gray)
             statusRow("square.dashed", "Lens", walk.settings.useLens ? walk.lens : "off in Settings", walk.lens == "on" ? .green : .gray)
             statusRow("mic", "Microphone", audio.running ? audio.input : "off", audio.running ? (audio.viaGlasses ? .green : .yellow) : .gray)
             statusRow("waveform", "Speech server", stt.state.label, sttColour)
@@ -179,6 +181,14 @@ struct HomeView: View {
         var text = glasses.worn ? "worn" : "connected"
         if let battery = glasses.battery { text += " · \(battery)%" }
         return text
+    }
+
+    private var bandText: String {
+        switch band.seen {
+        case .connected: return band.battery.map { "connected · \($0)%" } ?? "connected"
+        case .notSeen: return "not seen by the phone"
+        case .unknown: return walk.stage == .on ? "can't tell" : "checked during a walk"
+        }
     }
 
     private var sttColour: Color {

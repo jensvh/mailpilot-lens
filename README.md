@@ -60,7 +60,7 @@ English and Dutch both work. The words are MailPilot's; this app only passes on 
 
 **The microphone** opens when you pinch, when a card expects words, and after MailPilot has spoken. It closes when it stays quiet (45 seconds while a card waits for you, otherwise about 15), with a falling tone; a rising tone means it is open. Say "sleep" to close it at once. While it is closed nothing leaves the phone.
 
-**While it speaks it doesn't listen**, so it can't answer itself. A pinch still works. If the echo test shows the microphone doesn't hear the glasses' speakers, "Talk over it" in Settings lets you interrupt by voice.
+**While it speaks it doesn't listen**, so it can't answer itself. A pinch still works. The Talk button on the phone cuts it off and listens at once. If the echo test shows the microphone doesn't hear the glasses' speakers, "Talk over it" in Settings lets you interrupt by voice.
 
 **Without coverage** it says so once, the lens shows "Offline", and nothing is decided until MailPilot answers again. Then the current card comes back by itself.
 

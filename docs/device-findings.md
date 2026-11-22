@@ -73,6 +73,13 @@ A walk outside, in Dutch and in English, with wind and traffic. The log has ever
 - Depends on it: how long the microphone may stay open (noise that is heard as words goes to the assistant), and whether the fixed words need more spellings.
 - Found: ___.
 
+### 8. The Neural Band
+
+*Try the glasses → Look for the Neural Band.* Meta's toolkit doesn't report the band at all, so the app looks among the Bluetooth devices connected to the phone and reads the standard battery level if the band offers one.
+
+- Depends on it: the "Neural Band" row on the home screen and the low-battery warning on the home card. If the band talks to the glasses only, the row stays "not seen by the phone" and only Meta's own app knows its battery.
+- Found: listed devices ___, band name ___, battery read: ___.
+
 ## Edge cases to try every time
 
 - The back gesture on a card: the lens goes to Meta's home. Say "lens": the card is back within a few seconds.

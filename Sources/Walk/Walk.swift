@@ -38,6 +38,7 @@ final class Walk: ObservableObject {
     let stt = SttClient()
     let speaker = Speaker()
     let glasses = Glasses()
+    let band = NeuralBand()
     let voice: VoiceLoop
 
     private var lensWanted = false
@@ -79,6 +80,7 @@ final class Walk: ObservableObject {
 
         glasses.onChanged = { [weak self] in self?.glassesChanged() }
         glasses.onSessionEnded = { [weak self] in self?.sessionEnded() }
+        band.onChanged = { [weak self] in self?.reportStatus() }
 
         audio.onRouteChanged = { [weak self] in self?.reportStatus() }
         audio.onMediaKey = { [weak self] name in self?.mediaKey(name) }
@@ -144,6 +146,7 @@ final class Walk: ObservableObject {
         guard stage == .starting else { return }
 
         voice.begin()
+        band.start()
         startedAt = Date()
         stage = .on
         step = ""
@@ -196,6 +199,7 @@ final class Walk: ObservableObject {
             _ = await waitUntil(25) { !self.speaker.speaking }
         }
         voice.end()
+        band.stop()
         // The session first, the headset link last.
         await glasses.closeEverything()
         await rest(0.5)
@@ -303,7 +307,7 @@ final class Walk: ObservableObject {
     /// The phone's own Talk button: open the microphone.
     func talk() {
         guard stage == .on else { return }
-        voice.wake("the Talk button")
+        voice.wake("the Talk button", interrupt: true)
     }
 
     private func pinched(cardId: String, action: String) {
@@ -456,9 +460,11 @@ final class Walk: ObservableObject {
         guard stage == .on || stage == .starting else { return }
         let mic = audio.running ? audio.input : nil
         let showing = glasses.display.isOpen
-        let now = "\(glasses.connected)|\(glasses.worn)|\(glasses.battery ?? -1)|\(mic ?? "")|\(showing)"
+        let bandSeen: Bool? = band.seen == .unknown ? nil : band.seen == .connected
+        let now = "\(glasses.connected)|\(glasses.worn)|\(glasses.battery ?? -1)|\(mic ?? "")|\(showing)|\(String(describing: bandSeen))|\(band.battery ?? -1)"
         guard force || now != lastStatus else { return }
-        if link.send(.status(glasses: glasses.connected, worn: glasses.worn, battery: glasses.battery, mic: mic, display: showing)) {
+        if link.send(.status(glasses: glasses.connected, worn: glasses.worn, battery: glasses.battery, mic: mic, display: showing,
+                             band: bandSeen, bandBattery: band.battery)) {
             lastStatus = now
         }
     }

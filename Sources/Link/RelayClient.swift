@@ -30,6 +30,8 @@ final class RelayClient {
     private var attempt = 0
     private var ackId = 0
     private var waitingAcks: Set<Int> = []
+    /// Sends that wait to hear whether the relay took them.
+    private var sendAcks: [Int: (Bool) -> Void] = [:]
     private var retry: Task<Void, Never>?
     private var setupLimit: Task<Void, Never>?
     private var keepAlive: Task<Void, Never>?
@@ -70,6 +72,29 @@ final class RelayClient {
     func send(group: String, data: [String: Any]) -> Bool {
         guard connected else { return false }
         return write(["type": "sendToGroup", "group": group, "dataType": "json", "noEcho": true, "data": data], generation)
+    }
+
+    /// Sends and waits for the relay to say it took the message: true when it did, false when it refused (no
+    /// right to that group, or an address that ran out), nil when it didn't answer within 10 seconds.
+    func sendAcked(group: String, data: [String: Any]) async -> Bool? {
+        guard connected else { return false }
+        ackId += 1
+        let id = ackId
+        let gen = generation
+        return await withCheckedContinuation { (done: CheckedContinuation<Bool?, Never>) in
+            let once = Once()
+            sendAcks[id] = { ok in if once.claim() { done.resume(returning: ok) } }
+            guard write(["type": "sendToGroup", "group": group, "dataType": "json", "noEcho": true, "ackId": id, "data": data], gen) else {
+                sendAcks[id] = nil
+                if once.claim() { done.resume(returning: false) }
+                return
+            }
+            Task { [weak self] in
+                try? await Task.sleep(nanoseconds: 10_000_000_000)
+                self?.sendAcks[id] = nil
+                if once.claim() { done.resume(returning: nil) }
+            }
+        }
     }
 
     // MARK: Connecting
@@ -156,10 +181,16 @@ final class RelayClient {
                 onMessage?(group, data)
             }
         case "ack":
-            guard let id = (frame["ackId"] as? NSNumber)?.intValue, waitingAcks.contains(id) else { return }
+            guard let id = (frame["ackId"] as? NSNumber)?.intValue else { return }
             // "Duplicate" means the relay had it already: as good as done.
             let ok = (frame["success"] as? Bool) == true
                 || ((frame["error"] as? [String: Any])?["name"] as? String) == "Duplicate"
+            if let answer = sendAcks.removeValue(forKey: id) {
+                if !ok { Log.say("relay ((name)): a message was refused: (((frame["error"] as? [String: Any])?["message"] as? String) ?? "no reason given")") }
+                answer(ok)
+                return
+            }
+            guard waitingAcks.contains(id) else { return }
             guard ok else {
                 dropped(generation, "The relay refused this phone. Pair it again in MailPilot.")
                 return
@@ -203,6 +234,9 @@ final class RelayClient {
         keepAlive?.cancel()
         socket?.cancel(with: .goingAway, reason: nil)
         socket = nil
+        let waiting = sendAcks
+        sendAcks = [:]
+        for answer in waiting.values { answer(false) }
         setStatus(false, why)
         guard running else { return }
         // Half a second, doubling to ten, with some spread so two ends don't knock in step.

@@ -64,7 +64,7 @@ struct SettingsView: View {
         } header: {
             Text("MailPilot")
         } footer: {
-            Text("In MailPilot, open Glasses and choose Pair a phone. Scan the code with the iPhone camera: it opens this app. The code works once and for 3 minutes. Everything between this phone and MailPilot is encrypted with a key only the two of them have.")
+            Text("In MailPilot, open Glasses and choose Pair a phone. Scan the code with the iPhone camera: it opens this app. The code works once and for 10 minutes. Everything between this phone and MailPilot is encrypted with a key only the two of them have.")
         }
     }
 

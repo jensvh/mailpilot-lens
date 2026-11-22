@@ -37,7 +37,7 @@ The build holds no keys and no addresses. The app gets them when you pair it.
 ## First start
 
 1. **Glasses.** Open the app, tap the gear, then **Register with the Meta AI app** and allow MailPilot Lens there.
-2. **MailPilot.** On the PC, open MailPilot's Glasses page and choose **Pair a phone**. Scan the code with the iPhone camera: it opens this app, and a few seconds later the top row says the PC's name. The code works once and for 3 minutes.
+2. **MailPilot.** On the PC, open MailPilot's Glasses page and choose **Pair a phone**. Scan the code with the iPhone camera: it opens this app, and a few seconds later the top row says the PC's name. The code works once and for 10 minutes.
 
 Pairing gives the phone its own key, its address on the relay and the speech server's address and key, all sealed with the code's secret. They are kept in the iPhone's Keychain, on this device only. To remove a phone, use **Revoke** on MailPilot's Glasses page.
 

@@ -294,15 +294,24 @@ final class Link: ObservableObject {
             return
         }
         let ask = LensUp.pair(name: UIDevice.current.name, app: Self.appVersion)
-        guard let sealed = seal.seal(.up, ask.json(), at: LensClock().next()),
-              client.send(group: LensGroups.pairUp(invite.pairing), data: sealed) else {
-            pairingNote = "The request couldn't be sent. Try again."
+        guard let sealed = seal.seal(.up, ask.json(), at: LensClock().next()) else {
+            pairingNote = "The request couldn't be sealed. Try again."
             return
+        }
+        switch await client.sendAcked(group: LensGroups.pairUp(invite.pairing), data: sealed) {
+        case true?:
+            Log.say("pairing: the relay took the request")
+        case false?:
+            pairingNote = "The relay refused the request: this code's address has run out. Make a new code in MailPilot."
+            Log.say("pairing: the relay refused the request")
+            return
+        case nil:
+            Log.say("pairing: the relay didn't confirm the request; waiting anyway")
         }
         guard await waitUntil(15, { answer != nil }), let paired = answer,
               let key = Data(base64Encoded: paired.key), let made = LensEnvelope(device: paired.device, key: key) else {
-            pairingNote = "MailPilot didn't answer. The code is good for 3 minutes and works once: show a new one."
-            Log.say("pairing: no answer")
+            pairingNote = "MailPilot got the request but didn't pair. Its Glasses page says why (most often: the code ran out). Make a new code and scan it."
+            Log.say("pairing: no answer from MailPilot")
             return
         }
 

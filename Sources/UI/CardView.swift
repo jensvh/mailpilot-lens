@@ -23,7 +23,15 @@ struct CardView: View {
             }
             if let tiles = card.tiles, !tiles.isEmpty { tileRow(tiles) }
             ForEach(Array((card.rows ?? []).prefix(5).enumerated()), id: \.offset) { _, row in rowLine(row) }
-            ForEach(Array((card.blocks ?? []).prefix(6).enumerated()), id: \.offset) { _, block in blockLine(block) }
+            if let picture = CardImages.picture(for: card) {
+                // The same drawing the lens gets, so it can be judged without the glasses on.
+                Image(uiImage: picture)
+                    .resizable()
+                    .scaledToFit()
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            } else {
+                ForEach(Array((card.blocks ?? []).prefix(7).enumerated()), id: \.offset) { _, block in blockLine(block) }
+            }
             if let chips = card.chips, !chips.isEmpty { chipRow(chips) }
             if let hint = card.hint, !hint.isEmpty {
                 Text(hint).font(.footnote).foregroundStyle(.secondary)
@@ -95,9 +103,9 @@ struct CardView: View {
     private func blockLine(_ block: LensBlock) -> some View {
         HStack(spacing: 8) {
             Text(block.start).font(.footnote.monospacedDigit()).foregroundStyle(.secondary)
-            Text(block.title).lineLimit(1).foregroundStyle(block.done == true ? .secondary : .primary)
+            Text(block.kind == "now" ? "now" : block.title).lineLimit(1).foregroundStyle(block.done == true ? .secondary : .primary)
             Spacer(minLength: 0)
-            if let minutes = block.minutes {
+            if let minutes = block.minutes, minutes > 0 {
                 Text("\(minutes) min").font(.footnote).foregroundStyle(.secondary)
             }
         }
@@ -159,6 +167,7 @@ enum Symbols {
         case "check": return "checkmark"
         case "clip": return "paperclip"
         case "battery": return "battery.25"
+        case "warn": return "exclamationmark.triangle"
         case "question": return "questionmark.circle"
         case "spark": return "sparkles"
         case "list": return "list.bullet"

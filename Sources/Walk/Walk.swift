@@ -382,7 +382,7 @@ final class Walk: ObservableObject {
         let reopen = forceReopen || stale
         forceReopen = false
         let cardId = wanted.card.id
-        let shown = await glasses.show(wanted, reopen: reopen) { [weak self] action in
+        let shown = await glasses.show(wanted, reopen: reopen, pictures: settings.drawPictures) { [weak self] action in
             Task { @MainActor in self?.pinched(cardId: cardId, action: action) }
         }
         guard stage == .on else { return }

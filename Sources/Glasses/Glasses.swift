@@ -61,6 +61,8 @@ final class Glasses: ObservableObject {
     var onSessionEnded: (() -> Void)?
     /// A walk keeps its session between cards.
     var keepSessionOpen = false
+    /// The glasses didn't take a drawn card: text only until the app starts again.
+    private(set) var picturesFailed = false
 
     private let wearables = Wearables.shared
     private var deviceTokens: [any AnyListenerToken] = []
@@ -479,9 +481,23 @@ final class Glasses: ObservableObject {
     /// shows it on a new session instead: after the back gesture the app is
     /// closed on the glasses without a word to the phone, and only a new
     /// session brings a card back.
+    ///
+    /// `pictures`: a card that has a drawing (the day plan) is shown as one.
+    /// Only on a display that is open already, so a picture the glasses won't
+    /// take costs one failed update and nothing else: the same card then goes
+    /// as text, and so does every card until the app starts again.
     @discardableResult
-    func show(_ face: LensFace, reopen: Bool, onAction: @escaping @Sendable (String) -> Void) async -> Bool {
-        await show(view: CardRenderer.view(face, onAction: onAction), reopen: reopen)
+    func show(_ face: LensFace, reopen: Bool, pictures: Bool = false, onAction: @escaping @Sendable (String) -> Void) async -> Bool {
+        if pictures, !picturesFailed, !reopen, display.isOpen, let current = session, current.state == .started,
+           let picture = CardImages.picture(for: face.card) {
+            if await display.show(on: current, view: CardRenderer.view(face, picture: picture, onAction: onAction), fresh: false) {
+                Log.say("display: a drawn card of \(Int(picture.size.width))×\(Int(picture.size.height)), sent in \(display.sendMs ?? 0) ms")
+                return true
+            }
+            picturesFailed = true
+            Log.say("display: the picture wasn't shown (\(display.lastError)); cards are text from here on")
+        }
+        return await show(view: CardRenderer.view(face, onAction: onAction), reopen: reopen)
     }
 
     @discardableResult

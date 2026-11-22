@@ -35,8 +35,10 @@ Then the same with the phone **locked in a pocket** from step 6 on. If the app i
 
 *Try the glasses → A picture.* Is it sharp at lens size, and how long until it shows (the result line has the send time)?
 
-- Depends on it: whether the day plan becomes a timeline picture or stays text rows.
-- Found: send time ___ ms, readable: ___.
+Then the real one: on a walk, say "my day". The log line "a drawn card of 600×…, sent in … ms" has its size and time; "the picture wasn't shown" means the glasses refused it and the card came as text.
+
+- Depends on it: Settings → Lens → "Draw the day as a picture". It is on now, without having been seen on the glasses. If the picture is slow or hard to read, switch it off: the day plan is then rows of text.
+- Found: send time ___ ms, readable: ___, the day plan's picture: ___.
 
 ### 3. Does a card survive
 
@@ -88,4 +90,5 @@ A walk outside, in Dutch and in English, with wind and traffic. The log has ever
 - A phone call during a walk: afterwards the microphone and the lens work again without touching the phone.
 - Out of coverage for a minute: "No connection" is said once, the lens shows Offline, and afterwards the current card returns.
 - MailPilot restarted during a walk: the home card returns by itself.
+- The agent finishes a task during a walk: with the home card up, its result comes to the lens with a tone; in the middle of a mail it is one sentence that waits for what is being said, and the mail's card stays.
 - Swiping the app away: the glasses and the headset link are released.

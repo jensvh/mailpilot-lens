@@ -51,12 +51,20 @@ Pairing gives the phone its own key, its address on the relay and the speech ser
 | Where | Say |
 |---|---|
 | Anywhere | next, back, repeat, stop, undo, home, more, help, quiet, sleep, "the second one" |
+| Where to go | triage, tasks, results, my day, end walk |
 | A mail | delete, done, file it, later, read it, why, task, "task for Friday", "reply that…" |
 | A draft | save, discard; anything else is a change ("shorter", "add that Tom joins") |
 | A task | done, tomorrow, Friday, no date, high priority, "plan it at two", start it |
+| What the agent did | how, tests, read it, done, "changes: make the title shorter" |
+| The day plan | next task, fill my day |
+| Newsletters and alerts | done, delete, open them, later (all of them at once) |
 | Anything else | goes to MailPilot's assistant, with the card in front of you as "this" |
 
 English and Dutch both work. The words are MailPilot's; this app only passes on what it heard.
+
+**What comes by itself.** When the agent finishes a task, or asks something it can't go on without, MailPilot tells you. With the home card up, the result or the question comes to the lens. In the middle of something else it is one sentence and a line under the card, and the card stays. MailPilot's Glasses page sets what may interrupt (results and questions, questions only, or nothing), and "do not disturb" silences it for the walk.
+
+**The day plan** ("my day") is drawn as a timeline: a line for now, a filled bar for a meeting, an outlined one for a task you planned. If the glasses don't take the picture, the same card comes as text; Settings → Lens switches the drawing off.
 
 **The microphone** opens when you pinch, when a card expects words, and after MailPilot has spoken. It closes when it stays quiet (45 seconds while a card waits for you, otherwise about 15), with a falling tone; a rising tone means it is open. Say "sleep" to close it at once. While it is closed nothing leaves the phone.
 

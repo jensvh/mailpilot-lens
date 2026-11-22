@@ -1,6 +1,7 @@
 // No SwiftUI in this file: MWDATDisplay has its own Text, Button and Image.
 import Foundation
 import MWDATDisplay
+import UIKit
 
 /// What the lens shows: MailPilot's card, and one small line under it (what it
 /// did last, or what it heard).
@@ -25,12 +26,15 @@ enum LocalAction {
 /// by icons and by the order of the buttons: the first one is the suggested
 /// one, and it is the one in focus.
 enum CardRenderer {
-    static func view(_ face: LensFace, onAction: @escaping @Sendable (String) -> Void) -> FlexBox {
+    /// - Parameter picture: the card's body as a drawing (`CardImages.picture`),
+    ///   for a card that has one. It takes the place of the headline and the
+    ///   day's blocks: its first bar is what the headline would say.
+    static func view(_ face: LensFace, picture: UIImage? = nil, onAction: @escaping @Sendable (String) -> Void) -> FlexBox {
         let card = face.card
         var parts: [any ViewComponent] = []
 
         if let head = head(card) { parts.append(head) }
-        if let title = clean(card.title) {
+        if picture == nil, let title = clean(card.title) {
             parts.append(Text(title, style: .heading, color: .primary))
         }
         for line in (card.lines ?? []).prefix(3) {
@@ -38,14 +42,19 @@ enum CardRenderer {
         }
         if let tiles = card.tiles, !tiles.isEmpty { parts.append(tileRow(Array(tiles.prefix(3)))) }
         for row in (card.rows ?? []).prefix(5) { parts.append(rowLine(row, onAction)) }
-        for block in (card.blocks ?? []).prefix(6) { parts.append(blockLine(block)) }
+        if let picture {
+            parts.append(Image(image: picture, sizePreset: .fill, cornerRadius: .medium))
+        } else {
+            for block in (card.blocks ?? []).prefix(7) { parts.append(blockLine(block)) }
+        }
         if let chips = card.chips, !chips.isEmpty { parts.append(chipRow(Array(chips.prefix(2)))) }
         if let hint = clean(card.hint) { parts.append(Text(hint, style: .meta, color: .secondary)) }
         if let footer = clean(face.footer) { parts.append(Text(footer, style: .meta, color: .secondary)) }
         parts.append(buttons(card, onAction))
 
         let all = parts
-        return FlexBox(direction: .column, spacing: 14, alignment: .start, crossAlignment: .start) {
+        // A picture fills the width of the lens; text stays at the left.
+        return FlexBox(direction: .column, spacing: 14, alignment: .start, crossAlignment: picture == nil ? .start : .stretch) {
             for part in all { part }
         }
     }
@@ -93,11 +102,20 @@ enum CardRenderer {
         return line.onTap { onAction(id) }
     }
 
-    /// A piece of the day: "14:30  Send quote  30 min".
+    /// A piece of the day as text, when it isn't drawn: "14:30  Send quote  30 min",
+    /// with a line of its own for where "now" is.
     private static func blockLine(_ block: LensBlock) -> FlexBox {
-        let length = block.minutes.map { $0 >= 60 && $0 % 60 == 0 ? "\($0 / 60) h" : "\($0) min" }
+        if block.kind == "now" {
+            return FlexBox(direction: .row, spacing: 10, alignment: .start, crossAlignment: .center) {
+                Icon(name: .clock, style: .outline)
+                Text("\(block.start) · now", style: .meta, color: .primary)
+            }
+        }
+        let minutes = block.minutes ?? 0
+        let length: String? = minutes <= 0 ? nil : (minutes >= 60 && minutes % 60 == 0 ? "\(minutes / 60) h" : "\(minutes) min")
+        let symbol: IconName = block.done == true ? .checkmark : (block.kind == "meeting" ? .calendar : .caretRight)
         return FlexBox(direction: .row, spacing: 10, alignment: .start, crossAlignment: .center) {
-            if block.done == true { Icon(name: .checkmark, style: .outline) }
+            Icon(name: symbol, style: .outline)
             Text(block.start, style: .meta, color: .secondary)
             Text(block.title, style: .body, color: block.done == true ? .secondary : .primary)
             if let length { Text(length, style: .meta, color: .secondary) }
@@ -161,7 +179,7 @@ enum CardRenderer {
         case "reply": return .arrowULeft
         case "folder": return .containerWithLid
         case "check": return .checkmark
-        case "battery": return .exclamationTriangle
+        case "battery", "warn": return .exclamationTriangle
         case "question": return .iCircle
         case "spark": return .starCircleTriangleAi
         case "list": return .threeHorizontalLines

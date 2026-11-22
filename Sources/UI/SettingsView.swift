@@ -140,10 +140,11 @@ struct SettingsView: View {
                 Text("2 minutes").tag(120)
                 Text("Never").tag(0)
             }
+            Toggle("Draw the day as a picture", isOn: $settings.drawPictures)
         } header: {
             Text("Lens")
         } footer: {
-            Text("The back gesture closes the app on the glasses without telling the phone. So a card that has been up for longer than this, with no pinch in between, is shown on a new glasses session, which takes a few seconds. \"Never\" is faster, and after a back gesture you say \"lens\" to bring it back.")
+            Text("The back gesture closes the app on the glasses without telling the phone. So a card that has been up for longer than this, with no pinch in between, is shown on a new glasses session, which takes a few seconds. \"Never\" is faster, and after a back gesture you say \"lens\" to bring it back.\n\nThe day plan (\"my day\") is drawn as a timeline. If the glasses don't take the picture it comes as text by itself; switch it off if the picture is slow or hard to read.")
         }
     }
 

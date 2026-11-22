@@ -22,6 +22,8 @@ final class AppSettings: ObservableObject {
     @Published var staleSeconds: Int { didSet { store.set(staleSeconds, forKey: "staleSeconds") } }
     /// A tap on the glasses' frame (a media button) opens the microphone.
     @Published var tapWakes: Bool { didSet { store.set(tapWakes, forKey: "tapWakes") } }
+    /// The day plan goes to the lens as a drawn timeline instead of lines of text.
+    @Published var drawPictures: Bool { didSet { store.set(drawPictures, forKey: "drawPictures") } }
 
     init() {
         language = store.string(forKey: "language") ?? "auto"
@@ -31,6 +33,7 @@ final class AppSettings: ObservableObject {
         quietSeconds = store.object(forKey: "quietSeconds") as? Int ?? 45
         staleSeconds = store.object(forKey: "staleSeconds") as? Int ?? 45
         tapWakes = store.object(forKey: "tapWakes") as? Bool ?? false
+        drawPictures = store.object(forKey: "drawPictures") as? Bool ?? true
     }
 
     /// "en" or "nl": the chosen language, or the iPhone's when it is one of the two.

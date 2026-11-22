@@ -1,0 +1,82 @@
+name: iPhone build
+
+# There is no Mac in this project. This workflow is the compiler: it turns the
+# Swift sources into an unsigned .ipa, which is then signed and installed from
+# Windows with your own Apple ID (see README.md). Nothing secret is in this
+# repository or in what it builds: the app gets its keys when it is paired.
+
+on:
+  push:
+    paths: ['Sources/**', 'tools/**', 'project.yml', '.github/workflows/ios.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    name: MailPilot Lens
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - name: Select Xcode (pinned, so a runner update cannot change the build)
+        run: sudo xcode-select -s /Applications/Xcode_26.6.app && xcodebuild -version
+      # Messages sealed by MailPilot's own code (with a made-up key) must open
+      # here and read the same: the two sides agree on keys and field names.
+      - name: Check the link with MailPilot
+        run: |
+          swiftc -swift-version 5 -O Sources/Link/Envelope.swift Sources/Link/Protocol.swift tools/interop/main.swift -o interop-check
+          ./interop-check tools/interop/vectors.json
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate the Xcode project
+        run: xcodegen generate
+      - name: Fetch Meta's Device Access Toolkit
+        run: xcodebuild -resolvePackageDependencies -project MailPilotLens.xcodeproj -scheme MailPilotLens -derivedDataPath build
+      # The toolkit's public Swift API, straight from the binaries: the
+      # reference for writing this app without a Mac.
+      - name: Save the toolkit's API
+        run: |
+          mkdir -p api
+          # Every module's file is called arm64-apple-ios.swiftinterface: name the copy after its module.
+          find build/SourcePackages -name '*.swiftinterface' -path '*ios-arm64/*' ! -path '*simulator*' ! -name '*.private.swiftinterface' |
+            while read -r f; do m=$(basename "$(dirname "$f")" .swiftmodule); cp "$f" "api/$m.swiftinterface"; done || true
+          ls -l api
+      - uses: actions/upload-artifact@v7
+        with:
+          name: toolkit-api
+          path: api
+      - name: Build without signing
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project MailPilotLens.xcodeproj -scheme MailPilotLens \
+            -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            | tee build.log | grep -E 'error:|warning: unre|BUILD' || true
+          grep -q 'BUILD SUCCEEDED' build.log
+      - name: Keep the build errors
+        if: failure()
+        run: grep -E 'error:' build.log | sort -u | head -200 > errors.txt || true
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: errors
+          path: errors.txt
+      - name: Package the .ipa
+        run: |
+          mkdir Payload
+          cp -R build/Build/Products/Release-iphoneos/MailPilotLens.app Payload/
+          zip -qry MailPilotLens.ipa Payload
+          ls -l MailPilotLens.ipa
+      - uses: actions/upload-artifact@v7
+        with:
+          name: MailPilotLens
+          path: MailPilotLens.ipa
+          if-no-files-found: error

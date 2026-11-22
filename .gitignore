@@ -1,0 +1,20 @@
+# Made by XcodeGen and the build
+*.xcodeproj
+Info.plist
+build/
+api/
+Payload/
+build.log
+errors.txt
+interop-check
+
+# Downloaded and signed apps
+*.ipa
+build-out/
+
+# Never in the repository
+.env
+*.mobileprovision
+*.p12
+
+.DS_Store

@@ -1,0 +1,77 @@
+# XcodeGen recipe for MailPilot Lens. There is no Mac in this project: GitHub
+# Actions generates the Xcode project from this file and builds an unsigned
+# .ipa (.github/workflows/ios.yml).
+name: MailPilotLens
+options:
+  deploymentTarget:
+    iOS: "17.2"
+packages:
+  # Meta Wearables Device Access Toolkit: the glasses' session and display.
+  MWDAT:
+    url: https://github.com/meta/meta-wearables-dat-ios
+    exactVersion: 1.0.1
+settings:
+  base:
+    # Swift 5 language mode: written without a local compiler, so Swift 6's
+    # strict concurrency checks would only add build round trips.
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  MailPilotLens:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+    dependencies:
+      - package: MWDAT
+        product: MWDATCore
+      - package: MWDAT
+        product: MWDATDisplay
+    scheme: {}
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: MailPilot Lens
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        # Keeps the microphone, the speech stream, the relay connection and the
+        # glasses link alive while the phone is locked in a pocket.
+        UIBackgroundModes:
+          - audio
+          - bluetooth-central
+          - bluetooth-peripheral
+          - external-accessory
+          - processing
+        # The toolkit's Bluetooth Classic link to the glasses.
+        UISupportedExternalAccessoryProtocols:
+          - com.meta.ar.wearable
+        NSMicrophoneUsageDescription: MailPilot Lens listens through your glasses, so you can decide by voice.
+        NSBluetoothAlwaysUsageDescription: Needed to connect to your Meta glasses.
+        NSBluetoothPeripheralUsageDescription: Needed to connect to your Meta glasses.
+        ITSAppUsesNonExemptEncryption: false
+        # The log shows up in the Files app under "On My iPhone".
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+        # mailpilotlens://pair?… is the pairing code MailPilot shows; the Meta AI
+        # app also returns to this app through this scheme.
+        CFBundleURLTypes:
+          - CFBundleURLName: mailpilotlens
+            CFBundleTypeRole: Editor
+            CFBundleURLSchemes:
+              - mailpilotlens
+        # Device Access Toolkit. In Developer Mode no Meta app ID is needed.
+        MWDAT:
+          AppLinkURLScheme: mailpilotlens://
+          Analytics:
+            OptOut: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.jensvh.mailpilot.lens
+        TARGETED_DEVICE_FAMILY: "1"
+        GENERATE_INFOPLIST_FILE: NO
+        # The app is signed later, on Windows, with your Apple ID.
+        CODE_SIGNING_ALLOWED: NO

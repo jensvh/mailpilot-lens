@@ -1,0 +1,81 @@
+{
+  "device": "abc123",
+  "key": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
+  "items": [
+    {
+      "direction": "down",
+      "plain": "{\"t\":\"state\",\"state\":{\"rev\":42,\"sid\":\"s1\",\"phase\":\"asking\",\"card\":{\"id\":\"s1-7\",\"template\":\"mail\",\"icon\":\"person\",\"meta\":\"Ann Lee \\u00B7 2h \\u00B7 Atlas\",\"title\":\"Offer Q4: price by Friday?\",\"lines\":[\"Asks for the unit price for 200 pieces before Friday\\u0027s review.\"],\"chips\":[{\"text\":\"Needs a reply\",\"tone\":\"accent\",\"icon\":\"reply\"},{\"text\":\"Files\",\"tone\":\"plain\",\"icon\":\"clip\"}],\"tiles\":[{\"value\":\"4\",\"label\":\"Need you\",\"icon\":\"mail\"}],\"rows\":[{\"title\":\"First row\",\"meta\":\"meta\",\"icon\":\"mail\",\"done\":false,\"id\":\"pick:1\"},{\"title\":\"A step\",\"done\":true}],\"blocks\":[{\"start\":\"14:30\",\"title\":\"Send quote\",\"minutes\":30,\"kind\":\"task\",\"done\":false}],\"actions\":[{\"id\":\"reply\",\"label\":\"Reply\",\"style\":\"primary\",\"icon\":\"reply\"},{\"id\":\"task\",\"label\":\"Task\",\"style\":\"secondary\"},{\"id\":\"delete\",\"label\":\"Delete\",\"style\":\"danger\"}],\"position\":\"2/7\",\"page\":\"1/2\",\"danger\":false,\"hint\":\"Say a change, or save\"},\"deck\":\"triage\",\"note\":\"Deleted \\u00B7 say undo\",\"alert\":true,\"heard\":\"delete\",\"activity\":\"Searching mail\",\"listen\":true,\"asleep\":true,\"ended\":true,\"canUndo\":true,\"counts\":{\"needYou\":4,\"results\":2,\"today\":5,\"waiting\":23}},\"v\":1}",
+      "sealedText": "{\"v\":1,\"d\":\"abc123\",\"n\":1795000000000,\"b\":\"1iPRFEP/yPqp6xD82CWgS1Itgsj3c/9W0ZMY2iqTzNhIe8jWpz6\\u002B164ldpfx8uQqLpZrls9XmEKU5iqQYuNKAgcENwd55MsXQCCY0BTBOviAQ0nj6xbhi4dpb9YtbPL1evJHE1/yesH1u4f6/U1G/fyvC6Uwu6UAy\\u002BYjOiVx6KEnTyzK6r4a8UdvOVkdnKsgG71PpqW/8admQNkYIuMtetkcuDFUtVB9NWQlA1VPFsdQPf\\u002BydvyFBedkJwJcrOJCl5TeYBvmAvfxq07i2pwWQ8A5QHwf7bjQS9cu/ae9vEGchKeZ8cccDA1KlrAhMoVev73GffG7ktNFykFsCQSmt2kkXpHtLA2mJzS/iJeLM1l0yWlI/IrKEYCWaRmhbP7g6iUrRIZcx2/r1Bjp5GADAw1cEco0iMJ0QFPJCTXPDRzgNOh1xcrcpzaZrMHNqcJoOHv\\u002BNS1z/3WgMDKgM1HLiwF3BtbAn4pQoXX12d47Id8mx9EqAjOBaSJzBqYXnCEsguOea0Q393\\u002ByY35Kzyzpy3kJvWcEXEzSHqOyFl1qUQKRLXkAC6oPd9KTyo4FEzrfVo1VaXIeYiMMru6nLuw1zfAPG8AuljAoeFoU\\u002BHiNm3UGIISW1wWxSCe0uIFGU2DLfTWh3rL76PuLrKcrVlkF4ibPsDgG4HM90bl0eyhUqnv1ji8/wbWDohS/kKOkvtwL\\u002Bj/ZSJ9vwznmi9nwm979SZqMWlV9G1R65u10yJNRqNOAMWJf8vYSeOt9mUACl1zdPGGwXb4mIUjmhC9jC1nAPaQfuDTposp2AcEfYhrU9m9j\\u002BN9hwa4kFhT6UMTEYfVwzJKIsOHXQx1o8bH/AyIes9I\\u002BtxN3ItWlDEELURrw6UfQsxe/1LIjHhR47caCw0AHLVbeojgxny7L3AvQsGWmy2Z98VRme57xy\\u002Bti/hHJpPBh3tnataPNgTBt2UuyvWGzImTL0owt5n76Ksqa82d9XJc2pUtFNfBls3kYw4MQ4lRX4UytLOKMQO/23JHxPZzRzT8tAHePkpjTVe7xJdI5F0uc0cZx2/sjWW/H3R2PXXbHWoNxWEEBRzJQDX6\\u002BL85DzlFhEAsW2lOxMwiBsAiZqATOy95BiNoLvRFwiTGQBq1/OH4bvc6Jxf6VDH3VgCneDxgw8JETWE5MOhJjeIzt8pzutUyB62ngPAjnK3/m3Ex3/8ZP7s1JndLMyRoeKhv6NrCmuEmXgm4s5BXJWEwrLDbS4E\\u002BOxvSleV5zGeTYY7RsFuSKifRVa5WlxThd8MzSE/ckNIyHut5IF2vR7g7PKqppVTbgE75oMce26p1\\u002BDgfoz81TDlOJ8RKE9oMCEjBmqRWnqdz1C/nmmQsHPi8btEXtu\\u002BJGog964t/ppsg7//\\u002BE9DrTo5oSfZP2MM5D9KSTuLtVdFhgPdPFbkJT/csRSoxU6nyPn2\\u002BVbbd4UDKg629r8LHGSQoLl7rK9hWsVfeqf9/aQ76SeEWjic/hmPydaaG7WruOVajREMjN1535P8rri2CxkvT5vbhh0v3j1ygqfyY=\"}"
+    },
+    {
+      "direction": "down",
+      "plain": "{\"t\":\"speak\",\"id\":\"s1-s3\",\"parts\":[{\"text\":\"From Ann Lee, 2 hours ago.\",\"lang\":\"en\"},{\"text\":\"Offer Q4: prijs tegen vrijdag?\"}],\"interrupt\":true,\"earcon\":\"done\",\"v\":1}",
+      "sealedText": "{\"v\":1,\"d\":\"abc123\",\"n\":1795000000001,\"b\":\"D6nnFzABUoFvOAKrVpoA/ZfvjBd7gGGagDnqPbx2wowNG8fMT6ZFHN2Nx9j6O333mHo3yPErsON1J9X5gj2\\u002BUkzLAtgOkLdOPbucVNYRqAt2fyXakQ4xfE\\u002BA0UYS1WDJQFp8O\\u002BknYPncjp5TSsZNTJCUIH\\u002BzQSLksXrG5yPmS1F8iAgFPgNk0wIon8zlYAEVV8lR2ZH0hWETVCEYC9Cmhg4BgV4mU3TrS52z957tMfdxGAaU6qQoN5to1rerRKUDpCx8\"}"
+    },
+    {
+      "direction": "down",
+      "plain": "{\"t\":\"pong\",\"n\":9,\"v\":1}",
+      "sealedText": "{\"v\":1,\"d\":\"abc123\",\"n\":1795000000002,\"b\":\"2wBzO35Oh4HC\\u002BWzbgMFRMN7rrTezPwhiYomLP2vO/T5dc\\u002BNQ1nlLExT5vwaHgKL2Ga0ddg==\"}"
+    },
+    {
+      "direction": "down",
+      "plain": "{\"t\":\"paired\",\"device\":\"abc123\",\"key\":\"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=\",\"relay\":\"wss://relay.example/client/hubs/mailpilot?access_token=x\",\"speechUrl\":\"https://stt.example\",\"speechKey\":\"made-up-speech-key\",\"host\":\"PC\",\"v\":1}",
+      "sealedText": "{\"v\":1,\"d\":\"abc123\",\"n\":1795000000003,\"b\":\"\\u002Ba1YokJWpdbpq/\\u002Bay49tnNkqtgx\\u002BtobEnFPaRtGOp268wL0LcZkB\\u002BJNLsjaVuf9/QBFan00/3DQUnq2phV7icBs\\u002BQyLGaGOYyshC04lFooCa64kE7DhlWn3D4kUfvX3/6hQf2NqbvMXXpjjvaxRzjLzbMf9lBIPhu5cp1oz61DRwCN0lLbABIqLOTryAH8zk4OkwquATVvNi91Yax3IMMWgjGb5NpYc\\u002BpkaC6AbPUmKeWo8GT3CNmDoZZ0Q8v8mFmzezw4Jd/maNdPWPP2kpQPy/TwswfNUz8t7k6aoTP\\u002BLtMJBMhVAzVx1bk81KicpD8VJrCbbJQaterTOC53IF25Fo/pCSsM8dgg==\"}"
+    },
+    {
+      "direction": "down",
+      "plain": "{\"t\":\"config\",\"relay\":\"wss://relay.example/client/hubs/mailpilot?access_token=y\",\"speechUrl\":\"https://stt.example\",\"speechKey\":\"made-up-speech-key\",\"v\":1}",
+      "sealedText": "{\"v\":1,\"d\":\"abc123\",\"n\":1795000000004,\"b\":\"\\u002BoiK9aAOAKFYWyg10l\\u002ByAEHGZwnEh0rljGdihWRVf3GtjeHQlQ3QunaN2RZ56RnqmArOtCKBITkuAFQcB2w16si8xU8Q\\u002BrpSRLy\\u002Be\\u002B7wu/zAGdRyQKOxPyMNe\\u002BYPZdyn7qdfXbRlLKtqQby3FFT9hzuRRYtD2G9wK9kvCB9iEic40yuz/o3bxtqYTvAXmafJtVDqVyg5dhrdcYK6btc6ePa51k/ZyELfFicb263AGtBGn8JRmRk=\"}"
+    },
+    {
+      "direction": "up",
+      "plain": "{\"t\":\"heard\",\"text\":\"reply that Friday is fine\",\"duringSpeech\":true,\"v\":1}",
+      "sealedText": "{\"v\":1,\"d\":\"abc123\",\"n\":1795000000005,\"b\":\"IYZP4LLs5/7dlAWysJ/nxdmNO3guIEFSNDNG7GonzDOsGWmaQTczud4QTuYDN3zn9Yq7rU5gGQZY16DGmubeHsLm3Bxfn3wHx8aON6mXhRQ\\u002BqPxdxdX1vc034tOYCGHEKRNZKgQq\"}"
+    },
+    {
+      "direction": "up",
+      "plain": "{\"t\":\"act\",\"cardId\":\"s1-7\",\"action\":\"delete\",\"rev\":42,\"v\":1}",
+      "sealedText": "{\"v\":1,\"d\":\"abc123\",\"n\":1795000000006,\"b\":\"kfXpJ3i1HA5xaMEGvrA6Mf\\u002BjalU420uWPQkljKB00NImgAMF5WktUGAzhZwu3b0PYEC2MSIsZ8vNwDkE64Rg2tig5Pu8vhCDlXzXG58dNIG3U3WZtxiaAg==\"}"
+    },
+    {
+      "direction": "up",
+      "plain": "{\"t\":\"hello\",\"device\":\"abc123\",\"app\":\"0.1.0 (1)\",\"language\":\"nl\",\"fresh\":true,\"v\":1}",
+      "sealedText": "{\"v\":1,\"d\":\"abc123\",\"n\":1795000000007,\"b\":\"ojb/ihr/og206vR91Xr7INYtuuaEsrNURHvV8PVNiBCO5LSXVKbEdwz4YBynoHUu6IKayFbfeCG7paU3E4gTOh0qf9pxqplxgmvagPRMvo87lRZMNtAVqvQAC5QQSfHU4Sj6hSSC4j79FfPVzkYfcg==\"}"
+    },
+    {
+      "direction": "up",
+      "plain": "{\"t\":\"hello\",\"device\":\"abc123\",\"fresh\":false,\"v\":1}",
+      "sealedText": "{\"v\":1,\"d\":\"abc123\",\"n\":1795000000008,\"b\":\"qmk81y1RPbZMdWdydTyHXl8fQs1YFEsKYYNx66mvYuxn6hv7\\u002B85m\\u002Bub9CBYfr9dFgoZY12tVTIQ53948OyX/dzyfkC/8s5KEWmXaJJjgAQ==\"}"
+    },
+    {
+      "direction": "up",
+      "plain": "{\"t\":\"speaking\",\"v\":1}",
+      "sealedText": "{\"v\":1,\"d\":\"abc123\",\"n\":1795000000009,\"b\":\"VN3Wm3lKOlouqfIoqNUZUw66FHOiCF165PsjHT\\u002BPwWeS10EA8XUJw6vY822QTwLsXm8=\"}"
+    },
+    {
+      "direction": "up",
+      "plain": "{\"t\":\"spoke\",\"id\":\"s1-s3\",\"done\":false,\"v\":1}",
+      "sealedText": "{\"v\":1,\"d\":\"abc123\",\"n\":1795000000010,\"b\":\"Z96XFx4tvNXnnSqaP2B1GMvFjpHRORMHpGidxMAmB01Y3pTO4q9eTlqzbIgOu95CLUUeCjfZYuk5ecYj76S8niU02iD1\\u002Bxeidw==\"}"
+    },
+    {
+      "direction": "up",
+      "plain": "{\"t\":\"status\",\"glasses\":true,\"worn\":true,\"battery\":62,\"mic\":\"Ray-Ban Display (Bluetooth headset)\",\"display\":true,\"v\":1}",
+      "sealedText": "{\"v\":1,\"d\":\"abc123\",\"n\":1795000000011,\"b\":\"3tgVVPQeBzsm8aeKhKDkmRCGdvXIzBTeiliJvzItLMYEtFOSG\\u002B9l1QiEBJ5iWVFieA8jpnCMXp5NWgJQXjl3gsj4FKjZO93Bx7BybYE4jhBilJIMNekkCfGm\\u002BungJ/rG4W2hFeIYCtS0GfViPIPZx8e/M3l7uNFnDF0o\\u002BiynCH/cyPLMJp2XVR/kithOZYl4lvhO\"}"
+    },
+    {
+      "direction": "up",
+      "plain": "{\"t\":\"status\",\"glasses\":false,\"worn\":false,\"display\":false,\"v\":1}",
+      "sealedText": "{\"v\":1,\"d\":\"abc123\",\"n\":1795000000012,\"b\":\"Ot67uHdmyH0COvIwA9LiaBmIAYG5fBtfGZRQ3LEdWA4cmvPOpHs9L8ksKILk9qALyH/xNc/pWE1Fvf4bkWYGqBqLUvUJv9nSLxFYAlwIvEHVKx1Q6dcEmb/NB\\u002Bzx\"}"
+    },
+    {
+      "direction": "up",
+      "plain": "{\"t\":\"ping\",\"n\":7,\"v\":1}",
+      "sealedText": "{\"v\":1,\"d\":\"abc123\",\"n\":1795000000013,\"b\":\"xaFvr71MgUM6m1uK3M8OFvUY\\u002Bam6sxchf7SB06APe1gICx0oC9tkxHvjg/zoMrmkRhfgiA==\"}"
+    },
+    {
+      "direction": "up",
+      "plain": "{\"t\":\"pair\",\"name\":\"iPhone\",\"app\":\"0.1.0 (1)\",\"v\":1}",
+      "sealedText": "{\"v\":1,\"d\":\"abc123\",\"n\":1795000000014,\"b\":\"D/nrtFtSRSUeXV0gJIxEkcKw61bvEf7tpMLLeVDY1kMl5VyhvFKyDRHZbYVrlA3w9koMLHTerCmTe5o1iWANS7YX/GirKdJkhg2d8HjMBU8=\"}"
+    }
+  ]
+}

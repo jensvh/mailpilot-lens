@@ -186,7 +186,10 @@ final class RelayClient {
             let ok = (frame["success"] as? Bool) == true
                 || ((frame["error"] as? [String: Any])?["name"] as? String) == "Duplicate"
             if let answer = sendAcks.removeValue(forKey: id) {
-                if !ok { Log.say("relay ((name)): a message was refused: (((frame["error"] as? [String: Any])?["message"] as? String) ?? "no reason given")") }
+                if !ok {
+                    let why = ((frame["error"] as? [String: Any])?["message"] as? String) ?? "no reason given"
+                    Log.say("relay (\(name)): a message was refused: \(why)")
+                }
                 answer(ok)
                 return
             }

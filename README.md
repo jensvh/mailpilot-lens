@@ -107,7 +107,7 @@ There is no Mac in this project. [project.yml](project.yml) is an XcodeGen recip
 | `Sources/Walk` | the order things start and stop in, and what happens when something drops |
 | `Sources/UI` | the phone's screens |
 
-Meta's Device Access Toolkit is pinned at 1.0.1, and the code is in Swift 5 mode. The branch `toolkit-next` is the same app on toolkit 1.1.0, as a second build to try; what changed there is in [docs/device-findings.md](docs/device-findings.md).
+This branch (`toolkit-next`) is the app on Meta's Device Access Toolkit 1.1.0, as a second build to try after the 1.0.1 build on `main` has had its walk. The code is in Swift 5 mode and is the same as on `main`; what the toolkit changed is in [docs/device-findings.md](docs/device-findings.md).
 
 **Secrets.** This repository is public and holds no keys: the app gets them when it pairs and keeps them in the Keychain. Three checks keep it that way:
 - [The Secrets workflow](.github/workflows/secrets.yml) scans every commit with gitleaks.

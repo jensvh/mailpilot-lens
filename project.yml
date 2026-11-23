@@ -9,7 +9,7 @@ packages:
   # Meta Wearables Device Access Toolkit: the glasses' session and display.
   MWDAT:
     url: https://github.com/meta/meta-wearables-dat-ios
-    exactVersion: 1.0.1
+    exactVersion: 1.1.0
 settings:
   base:
     # Swift 5 language mode: written without a local compiler, so Swift 6's

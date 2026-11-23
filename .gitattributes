@@ -1,0 +1,2 @@
+# Git hooks are shell scripts: a CRLF line ending breaks them, whatever core.autocrlf says.
+.githooks/* text eol=lf

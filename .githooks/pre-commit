@@ -1,0 +1,30 @@
+#!/bin/sh
+# Stops a commit that adds a secret: an API key, a token, a private key, a connection string with its key.
+# It runs gitleaks on what is staged, with the repository's .gitleaks.toml and .gitleaksignore.
+#
+# Switch it on once per clone:   git config core.hooksPath .githooks
+# Install gitleaks:              winget install Gitleaks.Gitleaks (Windows), brew install gitleaks (Mac)
+#
+# A finding that is a test value: make the value at runtime in the test instead of writing it down.
+# A real key: unstage it, keep it in the Keychain or an ignored .env file, and rotate it if it
+# was ever pushed.
+
+gitleaks_bin=$(command -v gitleaks 2>/dev/null)
+if [ -z "$gitleaks_bin" ] && [ -n "$LOCALAPPDATA" ]; then
+    # winget's link folder is not on the PATH of a program that was already running when gitleaks was installed.
+    candidate="$(cygpath -u "$LOCALAPPDATA" 2>/dev/null || echo "$LOCALAPPDATA")/Microsoft/WinGet/Links/gitleaks.exe"
+    [ -x "$candidate" ] && gitleaks_bin=$candidate
+fi
+
+if [ -z "$gitleaks_bin" ]; then
+    echo "pre-commit: gitleaks is not installed, so this commit can't be checked for secrets." >&2
+    echo "pre-commit: install it (winget install Gitleaks.Gitleaks) and commit again." >&2
+    exit 1
+fi
+
+if ! "$gitleaks_bin" git --pre-commit --staged --redact --no-banner --verbose; then
+    echo "" >&2
+    echo "pre-commit: gitleaks found what looks like a secret in the staged changes (shown above, redacted)." >&2
+    echo "pre-commit: nothing was committed." >&2
+    exit 1
+fi

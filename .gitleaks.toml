@@ -1,0 +1,15 @@
+# Secret scanning with gitleaks (https://github.com/gitleaks/gitleaks). The pre-commit hook in .githooks and the
+# Secrets workflow both read this file: gitleaks' own rules, none switched off, and one exception below.
+#
+# This repository is public. Keys never go in it: the app gets them at pairing and keeps them in the Keychain.
+
+[extend]
+useDefault = true
+
+# The interop vectors are sealed with a published test key, the bytes 0 to 31, on purpose: the build opens them to
+# prove the app reads MailPilot's messages. That one value, in that one file, is not a secret.
+[[allowlists]]
+description = "The interop vectors' published test key (bytes 0..31)"
+condition = "AND"
+paths = ['''^tools/interop/vectors\.json$''']
+regexes = ['''AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=''']

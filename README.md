@@ -105,6 +105,13 @@ There is no Mac in this project. [project.yml](project.yml) is an XcodeGen recip
 
 Meta's Device Access Toolkit is pinned at 1.0.1, and the code is in Swift 5 mode.
 
+**Secrets.** This repository is public and holds no keys: the app gets them when it pairs and keeps them in the Keychain. Three checks keep it that way:
+- [The Secrets workflow](.github/workflows/secrets.yml) scans every commit with gitleaks.
+- GitHub's push protection is on.
+- A pre-commit hook runs the same check before a commit is made. Switch it on once per clone with `git config core.hooksPath .githooks`, with gitleaks installed.
+
+The one allowed exception is the interop vectors' published test key ([.gitleaks.toml](.gitleaks.toml)).
+
 ## Rules of the glasses it follows
 
 Found while testing another app on these glasses and confirmed on Meta's developer forum.

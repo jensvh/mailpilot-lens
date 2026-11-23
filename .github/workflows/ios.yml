@@ -32,6 +32,11 @@ jobs:
         run: |
           swiftc -swift-version 5 -O Sources/Link/Envelope.swift Sources/Link/Protocol.swift tools/interop/main.swift -o interop-check
           ./interop-check tools/interop/vectors.json
+      # What a speech server may make of "hey pilot", and what must not wake it.
+      - name: Check the wake phrase
+        run: |
+          swiftc -swift-version 5 -O Sources/Voice/WakePhrase.swift tools/wake/main.swift -o wake-check
+          ./wake-check
       - name: Install XcodeGen
         run: brew install xcodegen
       - name: Generate the Xcode project

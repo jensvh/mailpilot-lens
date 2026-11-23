@@ -94,7 +94,7 @@ struct HomeView: View {
                     }
                     .buttonStyle(.plain)
                     .background(Color(white: 0.13), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    LevelBar(level: audio.level, live: voice.mode == .listening)
+                    LevelBar(level: audio.level, live: voice.mode == .listening || voice.dozing)
                         .frame(width: 70, height: 10)
                 }
                 if !voice.partial.isEmpty {
@@ -124,7 +124,7 @@ struct HomeView: View {
     private var voiceLabel: String {
         switch voice.mode {
         case .off: return "Microphone off"
-        case .asleep: return "Asleep · tap to talk"
+        case .asleep: return voice.dozing ? "Asleep · say “\(WakePhrase.spoken)”" : "Asleep · tap to talk"
         case .listening: return "Listening"
         case .speaking: return "Speaking"
         }

@@ -24,6 +24,12 @@ final class AppSettings: ObservableObject {
     @Published var tapWakes: Bool { didSet { store.set(tapWakes, forKey: "tapWakes") } }
     /// The day plan goes to the lens as a drawn timeline instead of lines of text.
     @Published var drawPictures: Bool { didSet { store.set(drawPictures, forKey: "drawPictures") } }
+    /// "Hey pilot" wakes it: while it sleeps the microphone keeps going to the
+    /// speech server, and the phone looks for the phrase in what comes back.
+    @Published var wakePhrase: Bool { didSet { store.set(wakePhrase, forKey: "wakePhrase") } }
+    /// The glasses' own buttons and gestures reach the app (the toolkit's
+    /// experimental inputs): the capture button opens the microphone.
+    @Published var frameInputs: Bool { didSet { store.set(frameInputs, forKey: "frameInputs") } }
 
     init() {
         language = store.string(forKey: "language") ?? "auto"
@@ -34,6 +40,8 @@ final class AppSettings: ObservableObject {
         staleSeconds = store.object(forKey: "staleSeconds") as? Int ?? 45
         tapWakes = store.object(forKey: "tapWakes") as? Bool ?? false
         drawPictures = store.object(forKey: "drawPictures") as? Bool ?? true
+        wakePhrase = store.object(forKey: "wakePhrase") as? Bool ?? false
+        frameInputs = store.object(forKey: "frameInputs") as? Bool ?? false
     }
 
     /// "en" or "nl": the chosen language, or the iPhone's when it is one of the two.

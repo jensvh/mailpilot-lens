@@ -43,7 +43,7 @@ Pairing gives the phone its own key, its address on the relay and the speech ser
 
 ## A walk
 
-1. Tap **Start walk** with the app open (iOS only lets an app open the microphone while it is in front). Allow the microphone the first time.
+1. Tap **Start walk** with the app open (iOS only lets an app open the microphone while it is in front). Allow the microphone the first time. Or ask Siri: "Start a walk with MailPilot Lens" opens the app and starts the walk. The same shortcut ("Start walk", in the Shortcuts app under MailPilot Lens) can go on the Action button.
 2. Lock the phone and put it away. You hear the brief ("4 mails need you…") and the home card is on the lens.
 3. Pinch a button, or just say it. The first button on a card is the suggested one and is already in focus.
 4. **End walk** on the phone, or say "end walk": you hear what you decided, and the app lets go of the glasses.
@@ -67,6 +67,10 @@ English and Dutch both work. The words are MailPilot's; this app only passes on 
 **The day plan** ("my day") is drawn as a timeline: a line for now, a filled bar for a meeting, an outlined one for a task you planned. If the glasses don't take the picture, the same card comes as text; Settings → Lens switches the drawing off.
 
 **The microphone** opens when you pinch, when a card expects words, and after MailPilot has spoken. It closes when it stays quiet (45 seconds while a card waits for you, otherwise about 15), with a falling tone; a rising tone means it is open. Say "sleep" to close it at once. While it is closed nothing leaves the phone.
+
+**"Hey pilot"** (Settings → Voice, off at first) wakes it by voice. With it on, the microphone stays open while it sleeps and "hey pilot" or "MailPilot" wakes it; "hey pilot, triage" wakes it and goes straight on. What it hears while it sleeps goes to your speech server only, never to MailPilot: the phone looks for the phrase in the text that comes back and acts on nothing else. It costs battery nobody has measured yet, and about 115 MB of data an hour. The rules for what counts as the phrase are in [WakePhrase.swift](Sources/Voice/WakePhrase.swift), and the build runs them against [a list of what a speech server may make of it](tools/wake/main.swift).
+
+**Buttons on the frame** (Settings → Lens, off at first) asks the glasses for their own buttons and gestures. The capture button then opens the microphone, also when no card is up, and the back gesture goes one card back instead of closing the app on the glasses. Meta marks this part of its toolkit as experimental and it hasn't been tried here: if pinching a card stops working with it on, switch it off.
 
 **While it speaks it doesn't listen**, so it can't answer itself. A pinch still works. The Talk button on the phone cuts it off and listens at once. If the echo test shows the microphone doesn't hear the glasses' speakers, "Talk over it" in Settings lets you interrupt by voice.
 
@@ -103,7 +107,7 @@ There is no Mac in this project. [project.yml](project.yml) is an XcodeGen recip
 | `Sources/Walk` | the order things start and stop in, and what happens when something drops |
 | `Sources/UI` | the phone's screens |
 
-Meta's Device Access Toolkit is pinned at 1.0.1, and the code is in Swift 5 mode.
+Meta's Device Access Toolkit is pinned at 1.0.1, and the code is in Swift 5 mode. The branch `toolkit-next` is the same app on toolkit 1.1.0, as a second build to try; what changed there is in [docs/device-findings.md](docs/device-findings.md).
 
 **Secrets.** This repository is public and holds no keys: the app gets them when it pairs and keeps them in the Keychain. Three checks keep it that way:
 - [The Secrets workflow](.github/workflows/secrets.yml) scans every commit with gitleaks.
@@ -120,7 +124,7 @@ Found while testing another app on these glasses and confirmed on Meta's develop
 |---|---|
 | Bringing up the Bluetooth headset microphone while a toolkit session is open ends the session ([ios#342](https://github.com/meta/meta-wearables-dat-ios/issues/342)). | The headset link comes up before any session and goes down after the last one. |
 | Dropping and re-making the headset link a few times can make the glasses refuse sessions until they are switched off and on ([ios#375](https://github.com/meta/meta-wearables-dat-ios/issues/375)). | The link stays up for the whole walk, also while the microphone "sleeps". |
-| The back gesture closes the app on the glasses, and apps can't catch it ([ios#349](https://github.com/meta/meta-wearables-dat-ios/issues/349)). | Every card has a button. A card that has been up for a while without a pinch is shown on a new session; "lens" brings it back at any time. |
+| The back gesture closes the app on the glasses, and apps can't catch it ([ios#349](https://github.com/meta/meta-wearables-dat-ios/issues/349)). | Every card has a button. A card that has been up for a while without a pinch is shown on a new session; "lens" brings it back at any time. With "Buttons on the frame" on, the toolkit's experimental inputs are asked to hand the back gesture to the app instead. |
 | One tap pauses a session, a second tap resumes ([ios#312](https://github.com/meta/meta-wearables-dat-ios/issues/312)). | It says "paused" and waits for the tap; it never restarts a paused session. |
 | Keep one session, leave 2 seconds between sessions, and don't retry in a loop ([ios#292](https://github.com/meta/meta-wearables-dat-ios/issues/292)). | One session, a 2 second gap, one retry, and after two refusals it waits until you ask. |
 | The display fails once when it is asked for too early. | It is retried every 0.75 seconds, up to ten times. |

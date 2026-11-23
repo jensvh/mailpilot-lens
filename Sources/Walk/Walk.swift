@@ -58,9 +58,14 @@ final class Walk: ObservableObject {
     private var sawLiveState = false
     private var probeSentAt = Date()
     private var observers: [NSObjectProtocol] = []
+    private var watchers: Set<AnyCancellable> = []
+
+    /// The app's one walk, for what starts outside its screens (the "Start walk" shortcut).
+    private(set) static weak var current: Walk?
 
     init() {
         voice = VoiceLoop(audio: audio, stt: stt, speaker: speaker, settings: settings)
+        Walk.current = self
         wire()
         Log.say("MailPilot Lens \(Link.appVersion) on iOS \(UIDevice.current.systemVersion)")
         link.start()
@@ -77,9 +82,15 @@ final class Walk: ObservableObject {
         voice.onSpeakingStarted = { [weak self] in _ = self?.link.send(.speaking) }
         voice.onSpoke = { [weak self] id, done in _ = self?.link.send(.spoke(id: id, done: done)) }
         voice.onModeChanged = { [weak self] in self?.refreshLens() }
+        voice.onWakePhrase = { [weak self] rest in self?.wokeByPhrase(rest) }
+        // The switch works at once, also while it sleeps. (The new value comes just before it is stored.)
+        settings.$wakePhrase.dropFirst().removeDuplicates().sink { [weak self] on in
+            self?.voice.wakePhraseChanged(on)
+        }.store(in: &watchers)
 
         glasses.onChanged = { [weak self] in self?.glassesChanged() }
         glasses.onSessionEnded = { [weak self] in self?.sessionEnded() }
+        glasses.frame.onSignal = { [weak self] signal in self?.frameSignal(signal) }
         band.onChanged = { [weak self] in self?.reportStatus() }
 
         audio.onRouteChanged = { [weak self] in self?.reportStatus() }
@@ -128,7 +139,30 @@ final class Walk: ObservableObject {
         endedByMailPilot = false
         sawLiveState = false
         glasses.keepSessionOpen = true
+        glasses.frameInputsWanted = settings.frameInputs
         glasses.run("starting the walk", timeout: 90) { [weak self] in await self?.begin() }
+    }
+
+    /// "Start walk" from Siri, the Shortcuts app or the Action button. The app is in front by then (the shortcut
+    /// opens it), which the microphone needs. Returns what to tell the user.
+    func startFromShortcut() -> String {
+        guard link.paired else {
+            Log.say("shortcut: no walk, this phone isn't paired")
+            banner = "Pair this phone with MailPilot first: Settings, Pair."
+            return "Pair this phone with MailPilot first."
+        }
+        switch stage {
+        case .idle:
+            Log.say("shortcut: starting a walk")
+            start()
+            return "Starting your walk."
+        case .starting, .on:
+            Log.say("shortcut: a walk is on already")
+            return "A walk is already on."
+        case .ending:
+            Log.say("shortcut: the last walk is still ending")
+            return "The last walk is still ending. Try again in a moment."
+        }
     }
 
     private func begin() async {
@@ -307,7 +341,39 @@ final class Walk: ObservableObject {
     /// The phone's own Talk button: open the microphone.
     func talk() {
         guard stage == .on else { return }
-        voice.wake("the Talk button", interrupt: true)
+        wakeUp("the Talk button", interrupt: true)
+    }
+
+    /// Opens the microphone the way a pinch on Talk does. After "sleep" MailPilot holds the walk asleep until it
+    /// hears of a Talk, and would close the microphone again with its next card: so it is told.
+    private func wakeUp(_ why: String, interrupt: Bool = false, tell: Bool = true) {
+        voice.wake(why, interrupt: interrupt)
+        guard tell, let state = link.state, state.isAsleep, let card = state.card,
+              card.actions?.contains(where: { $0.id == Walk.talkAction }) == true else { return }
+        _ = link.send(.act(cardId: card.id, action: Walk.talkAction, rev: state.rev))
+    }
+
+    /// MailPilot's name for the Talk button on its cards.
+    private static let talkAction = "talk"
+
+    /// "Hey pilot" while it slept. What was said after it in the same breath goes on as if said awake.
+    private func wokeByPhrase(_ rest: String) {
+        guard stage == .on else { return }
+        // Words that follow wake MailPilot by themselves.
+        wakeUp("the wake phrase", tell: rest.isEmpty)
+        if !rest.isEmpty { heard(rest, false) }
+    }
+
+    /// A button or a gesture on the glasses themselves (Settings, "Buttons on the frame").
+    private func frameSignal(_ signal: FrameSignal) {
+        guard stage == .on else { return }
+        switch signal {
+        case .talk:
+            wakeUp("a button on the frame", interrupt: true)
+        case .back:
+            // The same as saying "back": the card before this one.
+            if !link.send(.heard(text: "back", duringSpeech: false)) { audio.earcon("error") }
+        }
     }
 
     private func pinched(cardId: String, action: String) {
@@ -323,7 +389,7 @@ final class Walk: ObservableObject {
         if speaker.speaking {
             voice.stopSpeaking()
         } else {
-            voice.wake("a tap on the frame")
+            wakeUp("a tap on the frame")
         }
     }
 

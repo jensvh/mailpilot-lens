@@ -28,6 +28,9 @@ targets:
         product: MWDATCore
       - package: MWDAT
         product: MWDATDisplay
+      # The glasses' own buttons and gestures (experimental in the toolkit; off unless chosen in Settings).
+      - package: MWDAT
+        product: MWDATInputs
     scheme: {}
     info:
       path: Info.plist

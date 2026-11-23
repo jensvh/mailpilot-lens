@@ -65,7 +65,7 @@ A whole walk with the headset link up and one session open: note the glasses' le
 
 With Settings → Voice → "A tap on the frame wakes it" on: does one tap arrive (the log says "media button"), and does it also pause the glasses' session (the app says "paused")?
 
-- Depends on it: whether there is a way to open the microphone when no card is in reach. Today that is a pinch on any button, the phone's own button, or waiting for MailPilot to speak.
+- Depends on it: whether there is a way to open the microphone when no card is in reach. Today that is a pinch on any button, the phone's own button, or waiting for MailPilot to speak. Two more ways are there to try, both off at first: the wake phrase (9) and the capture button (11).
 - Found: ___.
 
 ### 7. Hearing you outdoors
@@ -81,6 +81,39 @@ A walk outside, in Dutch and in English, with wind and traffic. The log has ever
 
 - Depends on it: the "Neural Band" row on the home screen and the low-battery warning on the home card. If the band talks to the glasses only, the row stays "not seen by the phone" and only Meta's own app knows its battery.
 - Found: listed devices ___, band name ___, battery read: ___.
+
+### 9. "Hey pilot"
+
+Settings → Voice → "Hey pilot" wakes it. Let it fall asleep (the falling tone), then say "hey pilot", and on another try "hey pilot, triage". The log has "wake phrase: …" for every time it woke and "wake phrase: not taken, …" for what came close, each with the words as the speech server heard them.
+
+- Depends on it: whether the switch can be on by default, and which spellings `Sources/Voice/WakePhrase.swift` needs. The rules were only run against a made-up list of what a speech server might hear (`tools/wake/main.swift`), never against a voice.
+- To check: does it wake, in Dutch and in English and outdoors; how often it wakes on a walk when nobody asked (other people talking, your own conversation); whether the speech stream stays up for a whole walk (the log says when it drops and comes back); the glasses' and the phone's battery per hour with it on, next to question 4 with it off.
+- Found: wakes on ___, missed ___, false wakes per hour ___, battery ___ % per hour (glasses), ___ % (phone).
+
+### 10. Siri and the Action button
+
+Say "Hey Siri, start a walk with MailPilot Lens", and try the "Start walk" shortcut from the Shortcuts app (it is listed under MailPilot Lens without setting anything up).
+
+- Depends on it: nothing in the app. If Siri doesn't know the phrase on an app signed from Windows, the shortcut in the Shortcuts app and on the Action button may still work.
+- To check: does the phrase work on this sideloaded build; does the walk start with the phone locked (the app has to come to the front for the microphone, so iOS will ask to unlock); the log says "shortcut: starting a walk".
+- Found: Siri ___, Shortcuts app ___, Action button ___, from a locked phone ___.
+
+### 11. Buttons on the frame
+
+Settings → Lens → "Buttons on the frame", then start a walk. With a card up: pinch its buttons as usual, press the capture button once, do the back gesture, swipe on the frame's touch strip. The log has a "frame: …" line for everything the glasses reported.
+
+- Depends on it: whether the switch can be on by default. On: the capture button opens the microphone (also with no card up, which answers question 6), and the back gesture goes a card back instead of closing the app on the glasses. Swipes and "select" are only logged for now: on a card they may move the focus as well, and that has to be seen first.
+- To check, in this order: do pinches on a card's buttons still work with it on (if not, switch it off: the glasses then hand the pinch to this instead of to the card); does the capture button arrive, and does it also take a photo; does the back gesture arrive and leave the card up; what a swipe on the frame reports.
+- Found: inputs state ___, pinches still work ___, capture button ___, back ___, swipes ___.
+
+## The toolkit
+
+The app is built on Meta's Device Access Toolkit 1.0.1. Read from its interface files on 23 November 2026:
+
+- **Inputs are in 1.0.1 already**, in a module of their own (`MWDATInputs`, marked experimental): `session.addInputs(…)` gives a stream of events for the capture button (short press, hold, double press), the action button, swipes and select from the frame's touch strip and the Neural Band, drags, and the back gesture, which the app can ask to get instead of being closed by it. Question 11 uses this.
+- The same release has experimental `MWDATSpeech` (transcription on the glasses, with the toolkit's microphone permission) and `VoiceInvocationsStream` ("Hey Meta, open …" reaching the app). Neither is used: the microphone here is the headset link's, and the toolkit's own needs testing of its own.
+- **1.1.0** (20 November 2026) adds `DeviceSession.pause()` and `resume()`, refuses a session with `notRegistered` when the app isn't registered, ends every session on unregistering, and drops the Wi-Fi Aware pairing types and the separate crash-reporting setting. Nothing this app calls changed, and nothing new reports input: there is still no event for "the glasses woke" or "the user looked at the lens".
+- The branch `toolkit-next` is this app on 1.1.0, built as a second `.ipa`. Try it only after the 1.0.1 build has had its walk.
 
 ## Edge cases to try every time
 

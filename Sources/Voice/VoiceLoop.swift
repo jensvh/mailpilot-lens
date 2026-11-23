@@ -30,6 +30,9 @@ final class PcmGate: @unchecked Sendable {
 ///   "talk over it" is on in Settings).
 /// - Asleep: the headset link stays up (dropping it upsets the glasses), but
 ///   nothing is sent anywhere. A pinch, or something MailPilot says, wakes it.
+/// - Asleep with the wake phrase on (Settings): the microphone still goes to
+///   your speech server, and nothing of what it hears goes to MailPilot. The
+///   phone only looks for "hey pilot" in it, and that wakes it.
 @MainActor
 final class VoiceLoop: ObservableObject {
     enum Mode: String {
@@ -42,9 +45,13 @@ final class VoiceLoop: ObservableObject {
     @Published private(set) var lastHeard = ""
     /// What is wrong with speech to text, when something is.
     @Published private(set) var problem: String?
+    /// Asleep, and waiting for the wake phrase: the speech stream is open, and only the phrase counts.
+    @Published private(set) var dozing = false
 
     /// A finished utterance, and whether it was heard while the glasses spoke.
     var onHeard: ((String, Bool) -> Void)?
+    /// The wake phrase was said while it slept, with what was said after it in the same breath ("" when nothing).
+    var onWakePhrase: ((String) -> Void)?
     var onSpeakingStarted: (() -> Void)?
     /// A speech message was said to the end, or cut off.
     var onSpoke: ((String, Bool) -> Void)?
@@ -117,6 +124,7 @@ final class VoiceLoop: ObservableObject {
         speaker.stop()
         partial = ""
         announced = false
+        dozing = false
         setMode(.off)
     }
 
@@ -127,6 +135,8 @@ final class VoiceLoop: ObservableObject {
     func wake(_ why: String, chime: Bool = true, interrupt: Bool = false) {
         guard mode != .off else { return }
         serverAsleep = false
+        // Awake from here on: what is heard goes to MailPilot again.
+        if dozing { dozing = false }
         if interrupt, mode == .speaking {
             Log.say("voice: listening (\(why), it stopped talking)")
             tail?.cancel()
@@ -151,15 +161,41 @@ final class VoiceLoop: ObservableObject {
     /// Closes the microphone until a pinch.
     func sleep(_ why: String, chime: Bool = true) {
         guard mode == .listening || mode == .speaking else { return }
-        Log.say("voice: asleep (\(why))")
         quietTimer?.cancel()
         retry?.cancel()
-        gate.mode = .closed
-        stt.stop()
         partial = ""
         announced = false
+        if settings.wakePhrase {
+            // The stream stays open, but from here on only the wake phrase is looked for.
+            Log.say("voice: asleep (\(why)), waiting for “\(WakePhrase.spoken)”")
+            dozing = true
+            gate.mode = .open
+            openStream()
+        } else {
+            Log.say("voice: asleep (\(why))")
+            dozing = false
+            gate.mode = .closed
+            stt.stop()
+        }
         if chime { audio.earcon("sleep") }
         setMode(.asleep)
+    }
+
+    /// The wake phrase was switched on or off in Settings while it sleeps.
+    func wakePhraseChanged(_ on: Bool) {
+        guard mode == .asleep, on != dozing else { return }
+        dozing = on
+        if on {
+            Log.say("voice: waiting for “\(WakePhrase.spoken)”")
+            retries = 0
+            gate.mode = .open
+            openStream()
+        } else {
+            Log.say("voice: no longer waiting for the wake phrase")
+            retry?.cancel()
+            gate.mode = .closed
+            stt.stop()
+        }
     }
 
     /// What MailPilot's state says about listening.
@@ -230,6 +266,9 @@ final class VoiceLoop: ObservableObject {
         if mode != .speaking { wasAsleepBeforeSpeech = mode == .asleep }
         if mode == .listening {
             gate.mode = settings.bargeIn ? .open : .silence
+        } else if mode == .asleep, dozing {
+            // It speaks while it waits for the wake phrase: it mustn't wake itself with its own words.
+            gate.mode = .silence
         }
         setMode(.speaking)
         watchSpeech()
@@ -302,6 +341,11 @@ final class VoiceLoop: ObservableObject {
     }
 
     private func heardPartial(_ words: String) {
+        if dozing {
+            // Asleep: nothing is shown and MailPilot isn't told that someone talks.
+            if !words.isEmpty { retries = 0 }
+            return
+        }
         guard mode == .listening || mode == .speaking else { return }
         partial = words
         guard !words.isEmpty else { return }
@@ -321,23 +365,54 @@ final class VoiceLoop: ObservableObject {
     private func heardFinal(_ words: String) {
         announced = false
         partial = ""
+        if dozing {
+            heardAsleep(words)
+            return
+        }
         guard mode == .listening || mode == .speaking else { return }
-        lastHeard = words
-        Log.say("heard: “\(words.prefix(80))”")
-        onHeard?(words, mode == .speaking)
+        var said = words
+        // The phrase said while it is awake already: it isn't part of the command.
+        if settings.wakePhrase, mode == .listening, case .woke(let rest) = WakePhrase.match(words) {
+            Log.say("wake phrase while awake: “\(words.prefix(80))”")
+            restartQuietTimer()
+            guard !rest.isEmpty else {
+                audio.earcon("wake")
+                return
+            }
+            said = rest
+        }
+        lastHeard = said
+        Log.say("heard: “\(said.prefix(80))”")
+        onHeard?(said, mode == .speaking)
         restartQuietTimer()
+    }
+
+    /// Something was said while it sleeps with the wake phrase on. Nothing of it goes to MailPilot; the phrase
+    /// wakes it. While it speaks nothing counts, so it can't wake itself.
+    private func heardAsleep(_ words: String) {
+        guard mode == .asleep, !speaker.speaking else { return }
+        switch WakePhrase.match(words) {
+        case .woke(let rest):
+            Log.say("wake phrase: “\(words.prefix(80))”")
+            lastHeard = words
+            onWakePhrase?(rest)
+        case .near:
+            Log.say("wake phrase: not taken, “\(words.prefix(80))”")
+        case .no:
+            break
+        }
     }
 
     /// The stream to the speech server dropped: three quick tries, then a slow one.
     private func streamClosed(_ why: String) {
-        guard mode == .listening || mode == .speaking else { return }
+        guard mode == .listening || mode == .speaking || dozing else { return }
         retries += 1
-        problem = "The speech server dropped (\(why)). Trying again."
-        let wait: Double = retries <= 3 ? Double(retries) : 10
+        if !dozing { problem = "The speech server dropped (\(why)). Trying again." }
+        let wait: Double = retries <= 3 ? Double(retries) : (dozing ? 30 : 10)
         retry?.cancel()
         retry = Task { [weak self] in
             try? await Task.sleep(nanoseconds: UInt64(wait * 1_000_000_000))
-            guard let self, !Task.isCancelled, self.mode == .listening || self.mode == .speaking else { return }
+            guard let self, !Task.isCancelled, self.mode == .listening || self.mode == .speaking || self.dozing else { return }
             self.openStream()
         }
     }

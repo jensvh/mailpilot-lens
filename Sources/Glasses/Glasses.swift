@@ -54,6 +54,9 @@ final class Glasses: ObservableObject {
     @Published private(set) var busy: String?
 
     let display = GlassesDisplay()
+    /// The glasses' own buttons and gestures; asked for only when `frameInputsWanted`.
+    let frame = FrameInputs()
+    var frameInputsWanted = false
 
     /// Something about the glasses changed: connected, worn, battery, the session.
     var onChanged: (() -> Void)?
@@ -426,6 +429,7 @@ final class Glasses: ObservableObject {
         sessionTasks.removeAll()
         pauseTimer?.cancel()
         display.dropAll()
+        frame.drop()
         session = nil
         lastSessionEnd = Date()
         sessionPhase = .off
@@ -521,6 +525,10 @@ final class Glasses: ObservableObject {
             }
         }
         if !ok { say("display: \(display.lastError)") }
+        // The frame's buttons come after the card, so a refusal there can't cost the card.
+        if ok, frameInputsWanted, let current = session, current.state == .started {
+            frame.attach(to: current)
+        }
         return ok
     }
 
@@ -546,6 +554,7 @@ final class Glasses: ObservableObject {
         pauseTimer?.cancel()
         currentWorker?.cancel()
         display.shutdownNow()
+        frame.drop()
         session?.stop()
         session = nil
         sessionPhase = .off

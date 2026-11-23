@@ -109,6 +109,7 @@ struct SettingsView: View {
                 Text("5 minutes").tag(300)
             }
             Toggle("Talk over it", isOn: $settings.bargeIn)
+            Toggle("\"Hey pilot\" wakes it", isOn: $settings.wakePhrase)
             Toggle("A tap on the frame wakes it", isOn: $settings.tapWakes)
             if let speech = link.speech {
                 LabeledContent("Speech server", value: URL(string: speech.url)?.host ?? speech.url)
@@ -125,7 +126,7 @@ struct SettingsView: View {
         } header: {
             Text("Voice")
         } footer: {
-            Text("The microphone opens on a pinch and after MailPilot has spoken, and closes when it stays quiet. \"Talk over it\" keeps listening while it speaks: only useful when the microphone doesn't pick up the glasses' own speakers (the echo test tells). A tap on the frame also pauses the glasses' session, so that switch is off until it has been tried.")
+            Text("The microphone opens on a pinch and after MailPilot has spoken, and closes when it stays quiet. \"Talk over it\" keeps listening while it speaks: only useful when the microphone doesn't pick up the glasses' own speakers (the echo test tells). A tap on the frame also pauses the glasses' session, so that switch is off until it has been tried.\n\nWith \"Hey pilot\" on, the microphone stays open while it sleeps, and \"hey pilot\" or \"MailPilot\" wakes it; \"hey pilot, triage\" wakes it and goes straight on. What it hears while it sleeps goes to your speech server only, never to MailPilot, and the phone acts on nothing but the phrase. It costs battery nobody has measured yet, and about 115 MB of data an hour.\n\nSiri can start a walk: \"Start a walk with MailPilot Lens\". The same shortcut can go on the Action button.")
         }
     }
 
@@ -141,10 +142,11 @@ struct SettingsView: View {
                 Text("Never").tag(0)
             }
             Toggle("Draw the day as a picture", isOn: $settings.drawPictures)
+            Toggle("Buttons on the frame (to try)", isOn: $settings.frameInputs)
         } header: {
             Text("Lens")
         } footer: {
-            Text("The back gesture closes the app on the glasses without telling the phone. So a card that has been up for longer than this, with no pinch in between, is shown on a new glasses session, which takes a few seconds. \"Never\" is faster, and after a back gesture you say \"lens\" to bring it back.\n\nThe day plan (\"my day\") is drawn as a timeline. If the glasses don't take the picture it comes as text by itself; switch it off if the picture is slow or hard to read.")
+            Text("The back gesture closes the app on the glasses without telling the phone. So a card that has been up for longer than this, with no pinch in between, is shown on a new glasses session, which takes a few seconds. \"Never\" is faster, and after a back gesture you say \"lens\" to bring it back.\n\nThe day plan (\"my day\") is drawn as a timeline. If the glasses don't take the picture it comes as text by itself; switch it off if the picture is slow or hard to read.\n\n\"Buttons on the frame\" asks the glasses for their own buttons and gestures, from the next walk on: the capture button then opens the microphone, also when no card is up, and the back gesture goes one card back instead of closing the app on the glasses. Meta calls this part experimental and nobody has tried it here: if pinching a card's buttons stops working with it on, switch it off. The log shows every button and gesture that arrives.")
         }
     }
 

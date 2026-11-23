@@ -44,23 +44,24 @@ Pairing gives the phone its own key, its address on the relay and the speech ser
 ## A walk
 
 1. Tap **Start walk** with the app open (iOS only lets an app open the microphone while it is in front). Allow the microphone the first time. Or ask Siri: "Start a walk with MailPilot Lens" opens the app and starts the walk. The same shortcut ("Start walk", in the Shortcuts app under MailPilot Lens) can go on the Action button.
-2. Lock the phone and put it away. You hear the brief ("4 mails need you…") and the home card is on the lens.
+2. Lock the phone and put it away. You hear the brief ("3 mails have tasks to decide, the agent is working on 1…") and the home card is on the lens.
 3. Pinch a button, or just say it. The first button on a card is the suggested one and is already in focus.
 4. **End walk** on the phone, or say "end walk": you hear what you decided, and the app lets go of the glasses.
 
 | Where | Say |
 |---|---|
-| Anywhere | next, back, repeat, stop, undo, home, more, help, quiet, sleep, "the second one" |
-| Where to go | triage, tasks, results, my day, end walk |
-| A mail | delete, done, file it, later, read it, why, task, "task for Friday", "reply that…" |
+| Anywhere | next, back, repeat, stop, undo, home, more, help, quiet, sleep, list, "the second one", "find mail from Tom about the invoice" |
+| Where to go | mails, agent, results, replies, inbox, tasks, my day, end walk |
+| A mail | tasks, "task: call the supplier", "task for Friday", read it, done, delete, file it, later, why, "reply that…" |
 | A draft | save, discard; anything else is a change ("shorter", "add that Tom joins") |
-| A task | done, tomorrow, Friday, no date, high priority, "plan it at two", start it |
-| What the agent did | how, tests, read it, done, "changes: make the title shorter" |
+| A task | start it, not a task, "rename to …", "it's a bug", the result, the mail, done, tomorrow, Friday, high priority, "plan it at two" |
+| A start | start, cancel, change, model, thinking, files, context, brief, "model opus", "add: …" |
+| What the agent did | how, tests, files, the task, the mail, read it, done, "changes: make the title shorter"; running, to review, failed, finished, all |
 | The day plan | next task, fill my day |
 | Newsletters and alerts | done, delete, open them, later (all of them at once) |
 | Anything else | goes to MailPilot's assistant, with the card in front of you as "this" |
 
-English and Dutch both work. The words are MailPilot's; this app only passes on what it heard.
+English, Dutch and French all work. The words are MailPilot's; this app only passes on what it heard.
 
 **What comes by itself.** When the agent finishes a task, or asks something it can't go on without, MailPilot tells you. With the home card up, the result or the question comes to the lens. In the middle of something else it is one sentence and a line under the card, and the card stays. MailPilot's Glasses page sets what may interrupt (results and questions, questions only, or nothing), and "do not disturb" silences it for the walk.
 

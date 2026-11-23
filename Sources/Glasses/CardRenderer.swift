@@ -188,6 +188,8 @@ enum CardRenderer {
         case "mic": return .speechBubble
         case "agent": return .magicWand
         case "task": return .checkmarkCircle
+        // The toolkit's set has no paperclip: stacked sheets stand for "files".
+        case "clip": return .twoSquaresStackedRightDown
         default: return nil
         }
     }

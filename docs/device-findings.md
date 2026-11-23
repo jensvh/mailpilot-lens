@@ -106,6 +106,22 @@ Settings → Lens → "Buttons on the frame", then start a walk. With a card up:
 - To check, in this order: do pinches on a card's buttons still work with it on (if not, switch it off: the glasses then hand the pinch to this instead of to the card); does the capture button arrive, and does it also take a photo; does the back gesture arrive and leave the card up; what a swipe on the frame reports.
 - Found: inputs state ___, pinches still work ___, capture button ___, back ___, swipes ___.
 
+### 12. Rows to pick from
+
+MailPilot's walk now shows lists: the tasks of a mail, the settings of a start, the models, the files, any deck after "list", what "find …" found. A row that can be picked is a box that takes a tap, not a button. Open a mail with two or more tasks and pinch *Tasks*.
+
+- Depends on it: whether a row can be picked by hand at all. If the highlight never reaches a row, rows are picked by voice ("the second one"), and every list keeps a button that walks through it (*Go through*, *More*), so nothing is out of reach.
+- To check: does a swipe on the band move the highlight from the buttons up to the rows and between them; does a pinch on a highlighted row open it; where the highlight is when the list appears (the first button, or the first row).
+- Found: highlight reaches rows ___, pinch opens a row ___, starts on ___.
+
+### 13. How many rows fit
+
+Lists show four rows with a headline, a hint and a row of buttons (`Lens:Card:ListRows` in MailPilot's settings); the level card of a start shows five.
+
+- Depends on it: that number. Too many and the buttons fall off the lens; room to spare and a list can show five or six.
+- To check: the tasks of a mail with four or more tasks, the *Thinking* card of a start (five rows), and a long title in a row (it is cut at 40 characters).
+- Found: rows that fit with buttons ___, the five-row card ___, a row's title ___.
+
 ## The toolkit
 
 The app is built on Meta's Device Access Toolkit 1.0.1. Read from its interface files on 23 November 2026:

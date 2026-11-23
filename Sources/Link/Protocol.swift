@@ -49,6 +49,13 @@ struct LensCounts: Decodable, Equatable {
     var results: Int?
     var today: Int?
     var waiting: Int?
+
+    // What the home card counts since MailPilot's walk is about tasks and the agent. The tiles are drawn from the
+    // card itself; these are here for whoever wants the numbers.
+    var mails: Int?
+    var running: Int?
+    var replies: Int?
+    var questions: Int?
 }
 
 /// One card. The server fills and clamps every field; the phone only draws.
